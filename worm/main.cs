@@ -2,14 +2,17 @@ using System;
 using System.IO;
 
 public class MainClass {
+    public static string path = "practice/";
+    public static string serverUrl = "http://127.0.0.1:8080/upload";
     public static void Main(String[] args) {
-        string path = "practice/";
-        string serverUrl = "http://127.0.0.1:8080/upload";
         if (args.Length == 1) {
             path = args[0];
         } else if (args.Length == 2) {
-
+            serverUrl = args[1];
+        } else {
+            Console.WriteLine("No arguments supplied, running with defaults");
         }
+        Console.WriteLine("Crawling " + path + " and uploading to " + serverUrl);
 
         if (!Directory.Exists(path)) {
             Console.WriteLine("Specified Directory Dosen't Exist! " + path);
@@ -19,11 +22,6 @@ public class MainClass {
 
         // FileUploader.UploadFile(path, "http://127.0.0.1:8080/upload");
 
-        RecursiveParser parser = new RecursiveParser(path);
-
-        foreach(string filepath in parser.FileList) {
-            Console.WriteLine("Initiating upload: " + filepath);
-            FileUploader.UploadFile(filepath, "http://127.0.0.1:8080/upload");
-        }
+        RecursiveParser parser = new RecursiveParser(path, serverUrl);
     }
 }
