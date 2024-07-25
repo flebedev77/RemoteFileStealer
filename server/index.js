@@ -28,6 +28,8 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage }); // Configure upload directory
 
+app.use(express.static(__dirname + "/uploads"));
+
 app.post('/upload', upload.single('file'), (req, res) => {
     if (!req.file) {
         log("User has not supplied upload request with a file!");

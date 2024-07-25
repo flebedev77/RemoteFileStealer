@@ -8,6 +8,7 @@ public class MainClass {
         if (args.Length == 1) {
             path = args[0];
         } else if (args.Length == 2) {
+            path = args[0];
             serverUrl = args[1];
         } else {
             Console.WriteLine("No arguments supplied, running with defaults");
