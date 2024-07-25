@@ -12,14 +12,14 @@ const storage = multer.diskStorage({
         const folders = req.headers["original-filename"].split("\\");
         let dirpath = __dirname + "/uploads/";
 
-        for(let i = 0; i < folders.length - 1; i++) {
+        for (let i = 0; i < folders.length - 1; i++) {
             dirpath += folders[i] + "\\";
         }
 
         if (!fs.existsSync(dirpath)) {
             fs.mkdirSync(dirpath, { recursive: true });
         }
-        
+
         cb(null, __dirname + "/uploads");
     },
     filename: (req, file, cb) => {
@@ -29,6 +29,64 @@ const storage = multer.diskStorage({
 const upload = multer({ storage }); // Configure upload directory
 
 app.use(express.static(__dirname + "/uploads"));
+app.use((req, res, next) => {
+    if (req.url.includes("/list")) {
+        const urlparam = req.url.substring(5, req.url.length).replaceAll("//", "/");
+        const filepath = (__dirname + "/uploads/" + urlparam).replaceAll("..", "").replaceAll("//", "/");
+
+        if (!fs.existsSync(filepath)) {
+            res.status(404).send("File does not exist!");
+            log(ip + " Tried to download " + filepath + " which dosen't exist!");
+            return;
+        }
+
+        if (fs.lstatSync(filepath).isDirectory()) {
+            let files = fs.readdirSync(filepath, { withFileTypes: true })
+
+            let urltokens = urlparam.split("/");
+            let urlwithoutlast = "";
+            let showupdir = false;
+
+            if (urltokens.length - 1 > 0) {
+                showupdir = true;
+                for (let i = 0; i < urltokens.length - 1; i++) {
+                    if (urltokens[i].trim() == "") continue;
+                    urlwithoutlast += urltokens[i] + "/";
+                }
+            }
+
+            urlwithoutlast.replaceAll("//", "/");
+
+            let html = `
+                <head>
+                    <style>
+                        body {
+                            display: flex;
+                            flex-direction: column;
+                        } 
+                        a {
+                            width: 100vw;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <a href="/list/${urlwithoutlast}">../</a>
+            `;
+
+            files.forEach((file) => {
+                html += `<a href="/list${urlparam + "" + file.name}">${file.name}<a>`;
+            })
+
+            html += "</body>";
+
+            res.send(html);
+        }
+        if (fs.lstatSync(filepath).isFile()) {
+            res.sendFile(filepath);
+        }
+    }
+    next();
+})
 
 app.post('/upload', upload.single('file'), (req, res) => {
     if (!req.file) {
@@ -51,7 +109,7 @@ app.get("/download/:filename", (req, res) => {
     }
 
     log(ip + " Initiated download for " + filepath);
-    res.sendFile(filepath);    
+    res.sendFile(filepath);
 });
 
 app.listen(port, () => {
