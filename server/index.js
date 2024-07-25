@@ -9,10 +9,21 @@ const port = process.env.PORT || 8080; // Change port if needed
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
+        const folders = req.headers["original-filename"].split("\\");
+        let dirpath = __dirname + "/uploads/";
+
+        for(let i = 0; i < folders.length - 1; i++) {
+            dirpath += folders[i] + "\\";
+        }
+
+        if (!fs.existsSync(dirpath)) {
+            fs.mkdirSync(dirpath, { recursive: true });
+        }
+        
         cb(null, __dirname + "/uploads");
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname);
+        cb(null, req.headers["original-filename"] || file.originalname);
     }
 })
 const upload = multer({ storage }); // Configure upload directory
