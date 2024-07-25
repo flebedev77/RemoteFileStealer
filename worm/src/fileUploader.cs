@@ -13,7 +13,7 @@ public class FileUploader
     {
       // Set headers (optional)
       client.Headers.Add("Content-Type", "application/octet-stream");
-      client.Headers.Add("Original-Filename", filePath.Replace(MainClass.path, ""));
+      client.Headers.Add("Original-Filename", filePath.Replace(MainClass.path + "\\", ""));
 
       // Upload the file
       byte[] res = client.UploadFile(serverUrl, filePath);

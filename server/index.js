@@ -11,6 +11,22 @@ if (!fs.existsSync(__dirname + "/uploads")) {
     fs.mkdirSync(__dirname + "/uploads");
 }
 
+function checkforinvalidfilenames() {
+    let filenames = fs.readdirSync(__dirname + "/uploads");
+
+    filenames.forEach((filename) => {
+        if (filename.charAt(0) == "\\" || filename.charAt(0) == "/") {
+            if (fs.lstatSync(__dirname + "/uploads/" + filename).isDirectory()) {
+                fs.rmdirSync(__dirname + "/uploads" + filename);
+            } else {
+                fs.rmSync(__dirname + "/uploads" + filename);
+            }
+        }
+    })
+}
+
+checkforinvalidfilenames();
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const folders = req.headers["original-filename"].split("\\");
