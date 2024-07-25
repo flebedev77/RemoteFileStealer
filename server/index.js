@@ -7,6 +7,10 @@ const fs = require("fs");
 const app = express();
 const port = process.env.PORT || 8080; // Change port if needed
 
+if (!fs.existsSync(__dirname + "/uploads")) {
+    fs.mkdirSync(__dirname + "/uploads");
+}
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const folders = req.headers["original-filename"].split("\\");
